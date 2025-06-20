@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ماسح باركود للتيليجرام</title>
+    <script src="https://unpkg.com/@zxing/library@0.18.6/umd/index.min.js"></script>
+</head>
+<body>
+    <h2>ماسح باركود للتيليجرام</h2>
+    <video id="video" width="300" height="200" style="border: 1px solid gray"></video>
+    <p id="result">النتيجة: <span>لم يتم المسح بعد</span></p>
+
+    <script>
+        const codeReader = new ZXing.BrowserBarcodeReader()
+        const videoElement = document.getElementById('video')
+        const resultElement = document.getElementById('result').querySelector('span')
+
+        codeReader.decodeFromVideoDevice(null, videoElement, (result, err) => {
+            if (result) {
+                resultElement.textContent = result.text
+                // هنا يمكنك إرسال النتيجة للبوت أو نسخها
+                console.log(result.text)
+                codeReader.reset() // توقف المسح بعد قراءة ناجحة
+            }
+            if (err && !(err instanceof ZXing.NotFoundException)) {
+                console.error(err)
+            }
+        })
+    </script>
+</body>
+</html>
