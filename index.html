@@ -2,64 +2,51 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8" />
-  <title>اختبار مسح الباركود</title>
+  <title>مسح الباركود والـ QR</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      margin: 20px;
+      padding: 20px;
     }
-    #scanner {
-      width: 400px;
-      height: 300px;
+    #reader {
+      width: 320px;
       margin: 0 auto;
-      border: 2px solid #444;
     }
     #result {
       margin-top: 20px;
-      font-size: 20px;
-      color: green;
+      font-size: 22px;
+      color: darkgreen;
     }
   </style>
 </head>
 <body>
-  <h2>اختبار مسح الباركود باستخدام QuaggaJS</h2>
-  <div id="scanner"></div>
+  <h2>اختبار مسح الباركود والـ QR</h2>
+  <div id="reader"></div>
   <div id="result">لم يتم مسح أي باركود بعد.</div>
 
-  <script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
-  <script>
-    // بدء تشغيل Quagga لقراءة الباركود
-    Quagga.init({
-      inputStream : {
-        name : "Live",
-        type : "LiveStream",
-        target: document.querySelector('#scanner'), // العنصر الذي يعرض الكاميرا
-        constraints: {
-          facingMode: "environment" // الكاميرا الخلفية إذا كانت متوفرة
-        }
-      },
-      decoder : {
-        readers : ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader",
-                  "code_39_vin_reader", "codabar_reader", "upc_reader", "upc_e_reader",
-                  "i2of5_reader", "2of5_reader", "code_93_reader"] // أنواع الباركود المدعومة
-      }
-    }, function(err) {
-        if (err) {
-            console.error(err);
-            document.getElementById('result').textContent = 'حدث خطأ في تهيئة القارئ';
-            return;
-        }
-        Quagga.start();
-    });
+  <!-- مكتبة html5-qrcode من CDN -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
 
-    // عند العثور على باركود
-    Quagga.onDetected(function(data) {
-      const code = data.codeResult.code;
-      document.getElementById('result').textContent = 'تم قراءة الباركود: ' + code;
-      // إذا تريد توقف الكاميرا بعد القراءة:
-      // Quagga.stop();
-    });
+  <script>
+    function onScanSuccess(decodedText, decodedResult) {
+      document.getElementById('result').textContent = "تم مسح: " + decodedText;
+      // يمكنك إيقاف المسح بعد قراءة واحدة إذا تريد:
+      html5QrcodeScanner.clear();
+    }
+
+    function onScanFailure(error) {
+      // يمكن تجاهل الأخطاء البسيطة أثناء المسح، لذا لا تفعل شيء هنا
+    }
+
+    // إنشاء كائن المسح
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+      "reader", 
+      { fps: 10, qrbox: 250 }
+    );
+
+    // بدء المسح
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
   </script>
 </body>
 </html>
